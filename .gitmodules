@@ -1,0 +1,3 @@
+[submodule "lmbspecialops"]
+	path = lmbspecialops
+	url = https://github.com/lmb-freiburg/lmbspecialops.git
