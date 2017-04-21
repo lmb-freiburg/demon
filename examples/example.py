@@ -47,6 +47,20 @@ if tf.test.is_gpu_available(True):
 else: # running on cpu requires channels_last data format
     data_format='channels_last'
 
+# 
+# DeMoN has been trained for specific internal camera parameters.
+#
+# If you use your own images try to adapt the intrinsics by cropping
+# to match the following normalized intrinsics:
+#
+#  K = (0.89115971  0           0.5)
+#      (0           1.18821287  0.5)
+#      (0           0           1  ),
+#  where K(1,1), K(2,2) are the focal lengths for x and y direction.
+#  and (K(1,3), K(2,3)) is the principal point.
+#  The parameters are normalized such that the image height and width is 1.
+#
+
 # read data
 img1 = Image.open(os.path.join(examples_dir,'sculpture1.png'))
 img2 = Image.open(os.path.join(examples_dir,'sculpture2.png'))
