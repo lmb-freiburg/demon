@@ -47,9 +47,8 @@ def compute_point_cloud_from_depthmap( depth, K, R, t, normals=None, colors=None
     return _compute_point_cloud_from_depthmap(depth, K, R, t, normals, colors)
 
 
-
-def create_camera_actor(R, t):
-    """Creates a vtkActor with a camera mesh"""
+def create_camera_polydata(R, t, only_polys=False):
+    """Creates a vtkPolyData object with a camera mesh"""
     import vtk
     cam_points = np.array([ 
         [0, 0, 0],
@@ -73,41 +72,80 @@ def create_camera_actor(R, t):
     vpoly = vtk.vtkPolyData()
     vpoly.SetPoints(vpoints)
     
-    line_cells = vtk.vtkCellArray()
-    
-    line_cells.InsertNextCell( 5 );
-    line_cells.InsertCellPoint( 1 );
-    line_cells.InsertCellPoint( 2 );
-    line_cells.InsertCellPoint( 3 );
-    line_cells.InsertCellPoint( 4 );
-    line_cells.InsertCellPoint( 1 );
+    poly_cells = vtk.vtkCellArray()
 
-    line_cells.InsertNextCell( 3 );
-    line_cells.InsertCellPoint( 1 );
-    line_cells.InsertCellPoint( 0 );
-    line_cells.InsertCellPoint( 2 );
+    if not only_polys:
+        line_cells = vtk.vtkCellArray()
+        
+        line_cells.InsertNextCell( 5 );
+        line_cells.InsertCellPoint( 1 );
+        line_cells.InsertCellPoint( 2 );
+        line_cells.InsertCellPoint( 3 );
+        line_cells.InsertCellPoint( 4 );
+        line_cells.InsertCellPoint( 1 );
 
-    line_cells.InsertNextCell( 3 );
-    line_cells.InsertCellPoint( 3 );
-    line_cells.InsertCellPoint( 0 );
-    line_cells.InsertCellPoint( 4 );
+        line_cells.InsertNextCell( 3 );
+        line_cells.InsertCellPoint( 1 );
+        line_cells.InsertCellPoint( 0 );
+        line_cells.InsertCellPoint( 2 );
 
-    # x-axis indicator
-    line_cells.InsertNextCell( 3 );
-    line_cells.InsertCellPoint( 8 );
-    line_cells.InsertCellPoint( 10 );
-    line_cells.InsertCellPoint( 9 );
+        line_cells.InsertNextCell( 3 );
+        line_cells.InsertCellPoint( 3 );
+        line_cells.InsertCellPoint( 0 );
+        line_cells.InsertCellPoint( 4 );
+
+        # x-axis indicator
+        line_cells.InsertNextCell( 3 );
+        line_cells.InsertCellPoint( 8 );
+        line_cells.InsertCellPoint( 10 );
+        line_cells.InsertCellPoint( 9 );
+        vpoly.SetLines(line_cells)
+    else:
+        # left
+        poly_cells.InsertNextCell( 3 );
+        poly_cells.InsertCellPoint( 0 );
+        poly_cells.InsertCellPoint( 1 );
+        poly_cells.InsertCellPoint( 4 );
+
+        # right
+        poly_cells.InsertNextCell( 3 );
+        poly_cells.InsertCellPoint( 0 );
+        poly_cells.InsertCellPoint( 3 );
+        poly_cells.InsertCellPoint( 2 );
+
+        # top
+        poly_cells.InsertNextCell( 3 );
+        poly_cells.InsertCellPoint( 0 );
+        poly_cells.InsertCellPoint( 4 );
+        poly_cells.InsertCellPoint( 3 );
+
+        # bottom
+        poly_cells.InsertNextCell( 3 );
+        poly_cells.InsertCellPoint( 0 );
+        poly_cells.InsertCellPoint( 2 );
+        poly_cells.InsertCellPoint( 1 );
+
+        # x-axis indicator
+        poly_cells.InsertNextCell( 3 );
+        poly_cells.InsertCellPoint( 8 );
+        poly_cells.InsertCellPoint( 10 );
+        poly_cells.InsertCellPoint( 9 );
 
     # up vector (y-axis)
-    poly_cells = vtk.vtkCellArray()
     poly_cells.InsertNextCell( 3 );
     poly_cells.InsertCellPoint( 5 );
     poly_cells.InsertCellPoint( 6 );
     poly_cells.InsertCellPoint( 7 );
-        
-    vpoly.SetLines(line_cells)
+
     vpoly.SetPolys(poly_cells)
-    
+
+    return vpoly
+
+
+def create_camera_actor(R, t):
+    """Creates a vtkActor object with a camera mesh"""
+    import vtk
+    vpoly = create_camera_polydata(R, t)
     mapper = vtk.vtkPolyDataMapper()
     mapper.SetInputData(vpoly)
 
@@ -119,8 +157,8 @@ def create_camera_actor(R, t):
     return actor
 
 
-def create_pointcloud_actor(points, colors=None):
-    """Creates a vtkActor with the point cloud from numpy arrays
+def create_pointcloud_polydata(points, colors=None):
+    """Creates a vtkPolyData object with the point cloud from numpy arrays
     
     points: numpy.ndarray
         pointcloud with shape (n,3)
@@ -128,7 +166,7 @@ def create_pointcloud_actor(points, colors=None):
     colors: numpy.ndarray
         uint8 array with colors for each point. shape is (n,3)
 
-    Returns vtkActor object
+    Returns vtkPolyData object
     """
     import vtk
     vpoints = vtk.vtkPoints()
@@ -155,6 +193,23 @@ def create_pointcloud_actor(points, colors=None):
         
     vpoly.SetVerts(vcells)
     
+    return vpoly
+
+
+
+def create_pointcloud_actor(points, colors=None):
+    """Creates a vtkActor with the point cloud from numpy arrays
+    
+    points: numpy.ndarray
+        pointcloud with shape (n,3)
+    
+    colors: numpy.ndarray
+        uint8 array with colors for each point. shape is (n,3)
+
+    Returns vtkActor object
+    """
+    import vtk
+    vpoly = create_pointcloud_polydata(points, colors)
     mapper = vtk.vtkPolyDataMapper()
     mapper.SetInputData(vpoly)
 
@@ -263,6 +318,89 @@ def visualize_prediction( inverse_depth, intrinsics=None, normals=None, rotation
     interactor.Initialize()
     interactor.Start()
     
+
+def export_prediction_to_ply( output_prefix, inverse_depth, intrinsics=None, normals=None, rotation=None, translation=None, image=None ):
+    """Exports the network predictions to ply files meant for external visualization
+
+    inverse_depth: numpy.ndarray
+        2d array with the inverse depth values with shape (h,w)
+
+    intrinsics: numpy.ndarray
+        4 element vector with the normalized intrinsic parameters with shape
+        (4,)
+
+    normals: numpy.ndarray
+        normal map with shape (3,h,w)
+
+    rotation: numpy.ndarray
+        rotation in axis angle format with 3 elements with shape (3,)
+
+    translation: numpy.ndarray
+        translation vector with shape (3,)
+
+    image: numpy.ndarray
+        Image with shape (3,h,w) in the range [-0.5,0.5].
+    """
+    import vtk
+    depth = (1/inverse_depth).squeeze()
+
+    w = depth.shape[-1]
+    h = depth.shape[-2]
+
+    if intrinsics is None:
+        intrinsics = np.array([0.89115971, 1.18821287, 0.5, 0.5]) # sun3d intrinsics
+
+    K = np.eye(3)
+    K[0,0] = intrinsics[0]*w
+    K[1,1] = intrinsics[1]*h
+    K[0,2] = intrinsics[2]*w
+    K[1,2] = intrinsics[3]*h
+
+    R1 = np.eye(3)
+    t1 = np.zeros((3,))
+
+    if not rotation is None and not translation is None:
+        R2 = angleaxis_to_rotation_matrix(rotation.squeeze())
+        t2 = translation.squeeze()
+    else:
+        R2 = np.eye(3)
+        t2 = np.zeros((3,))
+
+    if not normals is None:
+        n = normals.squeeze()
+    else:
+        n = None
+
+    if not image is None:
+        img = ((image+0.5)*255).astype(np.uint8)
+    else:
+        img = None
+
+    pointcloud = compute_point_cloud_from_depthmap(depth, K, R1, t1, n, img)
+
+    pointcloud_polydata = create_pointcloud_polydata( 
+        points=pointcloud['points'], 
+        colors=pointcloud['colors'] if 'colors' in pointcloud else None,
+        )
+    plywriter = vtk.vtkPLYWriter()
+    plywriter.SetFileName(output_prefix + 'points.ply')
+    plywriter.SetInputData(pointcloud_polydata)
+    plywriter.SetArrayName('Colors')
+    plywriter.Write()
+    
+    cam1_polydata = create_camera_polydata(R1,t1, True)
+    plywriter = vtk.vtkPLYWriter()
+    plywriter.SetFileName(output_prefix + 'cam1.ply')
+    plywriter.SetInputData(cam1_polydata)
+    plywriter.Write()
+    
+    cam2_polydata = create_camera_polydata(R2,t2, True)
+    plywriter = vtk.vtkPLYWriter()
+    plywriter.SetFileName(output_prefix + 'cam2.ply')
+    plywriter.SetInputData(cam2_polydata)
+    plywriter.Write()
+
+
 
 def transform_pointcloud_points(points, T):
     """Transforms the pointcloud with T
