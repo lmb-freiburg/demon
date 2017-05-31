@@ -41,7 +41,7 @@ The network also depends on our [lmbspecialops](https://github.com/lmb-freiburg/
 
 ## Build instructions
 
-The following describes how to install tensorflow and demon into a new virtualenv and run the example.
+The following describes how to install tensorflow and demon into a new virtualenv and run the inference example.
 We will use ```pew``` (```pip install pew```) to manage a new virtualenv named ```demon_venv``` in the following:
 
 ```bash
@@ -56,6 +56,7 @@ The following commands all run inside the virtualenv:
 pip install tensorflow-gpu # or 'tensorflow' without gpu support
 pip install pillow # for reading images
 pip install matplotlib # required for visualizing depth maps
+pip install Cython # required for visualizing point clouds
 ```
 
 ```bash
@@ -79,6 +80,25 @@ cd $DEMON_DIR/weights
 cd $DEMON_DIR/examples
 python3 example.py # opens a window with the depth map (and the point cloud if vtk is available)
 ```
+
+## Data reader op & evaluation
+
+The data reader op and the evaluation code have additional dependencies.
+The code for the data reader is in the ```multivih5datareaderop``` directory. 
+See the corresponding [readme](multivih5datareaderop/README.md) for more details.
+
+For the evaluation see the example [```examples/evaluation.py```](examples/evaluation.py).
+The evaluation code requires the following additional python3 packages, which can be installed with ```pip```:
+
+```
+h5py
+minieigen
+pandas
+scipy
+scikit-image
+xarray
+```
+Note that the evaluation code also depends on the data reader op.
 
 
 
