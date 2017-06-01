@@ -6,10 +6,10 @@ import sys
 import numpy as np
 from PIL import Image
 import h5py
-from depthmotionnet.dataset_tools import *
 
 examples_dir = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(examples_dir, '..', 'python'))
+from depthmotionnet.dataset_tools import *
 
 
 # intrinsics supported by DeMoN

@@ -15,19 +15,17 @@ import json
 import h5py
 import xarray
 import numpy as np
-from depthmotionnet.datareader import *
-from depthmotionnet.networks_original import *
-from depthmotionnet.helpers import convert_NCHW_to_NHWC, convert_NHWC_to_NCHW
-from depthmotionnet.evaluation import *
 import lmbspecialops as sops
 import tensorflow as tf
-
-
 
 examples_dir = os.path.dirname(__file__)
 weights_dir = os.path.join(examples_dir,'..','weights')
 sys.path.insert(0, os.path.join(examples_dir, '..', 'python'))
 
+from depthmotionnet.datareader import *
+from depthmotionnet.networks_original import *
+from depthmotionnet.helpers import convert_NCHW_to_NHWC, convert_NHWC_to_NCHW
+from depthmotionnet.evaluation import *
 
 
 def create_ground_truth_file(dataset, dataset_dir):
