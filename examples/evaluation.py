@@ -260,55 +260,57 @@ def create_prediction_file(dataset, dataset_dir):
     tf.reset_default_graph()
     return prediction_file
 
+def main():
+
+    # list the test datasets names for evaluation
+    datasets = ('mvs', 'scenes11', 'rgbd', 'sun3d')
+    dataset_dir = os.path.join('..', 'datasets')
 
 
-# list the test datasets names for evaluation
-datasets = ('mvs', 'scenes11', 'rgbd', 'sun3d')
-dataset_dir = os.path.join('..', 'datasets')
 
-
-
-# creating the ground truth and prediction files requires about 4gb of disk space
-for dataset in datasets:
-    gt_file = create_ground_truth_file(dataset, dataset_dir)
-    
-    print('creating predictions for', dataset)
-    pr_file = create_prediction_file(dataset, dataset_dir)
-
-    # compute errors
-    # the evaluate function expects the path to a prediction and the corresponding
-    # ground truth file.
-    print('computing errors for', dataset)
-    eval_result = evaluate(pr_file, gt_file)
-    
-    # save evaluation results to disk
-    write_xarray_json(eval_result, '{0}_eval.json'.format(dataset))
+    # creating the ground truth and prediction files requires about 4gb of disk space
+    for dataset in datasets:
+        gt_file = create_ground_truth_file(dataset, dataset_dir)
         
+        print('creating predictions for', dataset)
+        pr_file = create_prediction_file(dataset, dataset_dir)
+
+        # compute errors
+        # the evaluate function expects the path to a prediction and the corresponding
+        # ground truth file.
+        print('computing errors for', dataset)
+        eval_result = evaluate(pr_file, gt_file)
+        
+        # save evaluation results to disk
+        write_xarray_json(eval_result, '{0}_eval.json'.format(dataset))
+            
 
 
-# print errors
-for dataset in datasets:
-    
-    eval_result = read_xarray_json('{0}_eval.json'.format(dataset))
+    # print errors
+    for dataset in datasets:
+        
+        eval_result = read_xarray_json('{0}_eval.json'.format(dataset))
 
-    # eval_result is a 5D array with the following dimensions:
-    #  - snapshots: stores results of different network training states
-    #  - iteration: network iterations '0' stores the result of the bootstrap network.
-    #               '3' stores the results after bootstrap + 3 times iterative network.
-    #               '3_refined' stores the result after the refinement network.
-    #  - sample: the sample number.
-    #  - errors: stores the different error metrics.
-    #  - scaled: is a boolean dimension used for storing errors after optimal scaling 
-    #            the prediction with a scalar factor. This was meant as an alternative
-    #            to scale invariant error measures. Just set this to False and ignore.
-    # 
-    # The following prints the error metrics as used in the paper.
-    depth_errors = ['depth_l1_inverse','depth_scale_invariant','depth_abs_relative']
-    motion_errors = ['rot_err','tran_angle_err']
-    print('======================================')
-    print('dataset: ', dataset)
-    print('  depth', eval_result[0].loc['3_refined',:,depth_errors,False].mean('sample').to_pandas().to_string())
-    print('  motion', eval_result[0].loc['3',:,motion_errors,False].mean('sample').to_pandas().to_string())
+        # eval_result is a 5D array with the following dimensions:
+        #  - snapshots: stores results of different network training states
+        #  - iteration: network iterations '0' stores the result of the bootstrap network.
+        #               '3' stores the results after bootstrap + 3 times iterative network.
+        #               '3_refined' stores the result after the refinement network.
+        #  - sample: the sample number.
+        #  - errors: stores the different error metrics.
+        #  - scaled: is a boolean dimension used for storing errors after optimal scaling 
+        #            the prediction with a scalar factor. This was meant as an alternative
+        #            to scale invariant error measures. Just set this to False and ignore.
+        # 
+        # The following prints the error metrics as used in the paper.
+        depth_errors = ['depth_l1_inverse','depth_scale_invariant','depth_abs_relative']
+        motion_errors = ['rot_err','tran_angle_err']
+        print('======================================')
+        print('dataset: ', dataset)
+        print('  depth', eval_result[0].loc['3_refined',:,depth_errors,False].mean('sample').to_pandas().to_string())
+        print('  motion', eval_result[0].loc['3',:,motion_errors,False].mean('sample').to_pandas().to_string())
 
+if __name__ == "__main__":
+    main()
 
 
