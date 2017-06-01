@@ -278,8 +278,9 @@ def main():
         # compute errors
         # the evaluate function expects the path to a prediction and the corresponding
         # ground truth file.
+        # depthmask=True will compute depth errors only for pixels visible in both images.
         print('computing errors for', dataset)
-        eval_result = evaluate(pr_file, gt_file)
+        eval_result = evaluate(pr_file, gt_file, depthmask=True)
         
         # save evaluation results to disk
         write_xarray_json(eval_result, '{0}_eval.json'.format(dataset))
