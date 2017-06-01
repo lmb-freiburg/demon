@@ -19,6 +19,28 @@ import pyximport; pyximport.install()
 import numpy as np
 
 
+def compute_visible_points_mask( view1, view2, borderx=0, bordery=0 ):
+    """Computes a mask of the pixels in view1 that are visible in view2
+
+    view1: View namedtuple
+        First view
+
+    view2: View namedtuple
+        Second view
+
+    borderx: int
+        border in x direction. Points in the border are considered invalid
+
+    bordery: int
+        border in y direction. Points in the border are considered invalid
+
+    Returns a mask of valid points
+    """
+    from .view_tools_cython import compute_visible_points_mask as _compute_visible_points_mask
+    assert view1.depth_metric == 'camera_z', "Depth metric must be 'camera_z'"
+    return _compute_visible_points_mask( view1, view2, borderx, bordery )
+
+
 def compute_depth_ratios( view1, view2 ):
     """Projects each point defined in view1 to view2 and computes the ratio of 
     the depth value of the projected point and the stored depth value in view2.

@@ -103,9 +103,9 @@ def invalidate_points_not_visible_in_second_image(depth, motion, intrinsics):
         the normalized intrinsics vector
         If None we assume intrinsics as in sun3d
     """
-    from .vis import motion_vector_to_Rt, intrinsics_vector_to_K
-    from .multivih5 import View
-    from .viewtools import compute_visible_points_mask
+    from .helpers import motion_vector_to_Rt, intrinsics_vector_to_K
+    from ..dataset_tools.view import View
+    from ..dataset_tools.view_tools import compute_visible_points_mask
     #from matplotlib import pyplot as plt
     abs_depth = 1/depth
     R, t = motion_vector_to_Rt(motion.squeeze())
