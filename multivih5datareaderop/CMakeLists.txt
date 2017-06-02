@@ -45,20 +45,10 @@ set( lz4_STATIC_LIB "${BINARY_DIR}/liblz4.a" )
 
 
 # json for modern c++
-ExternalProject_Add( 
-        json_for_modern_cpp
-        PREFIX "${CMAKE_BINARY_DIR}/json"
-	URL "https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp"
-	DOWNLOAD_NO_EXTRACT 1
-        # do not update, configure, build
-        UPDATE_COMMAND ""
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""
-        # do not install
-        INSTALL_COMMAND ""
-)
-ExternalProject_Get_Property( json_for_modern_cpp SOURCE_DIR )
-set( json_for_modern_cpp_INCLUDE_DIR "${SOURCE_DIR}/.." )
+message( STATUS "Downloading json" )
+file( DOWNLOAD "https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp"
+      "${CMAKE_BINARY_DIR}/json_for_modern_cpp/json.hpp" SHOW_PROGRESS )
+set( json_for_modern_cpp_INCLUDE_DIR "${CMAKE_BINARY_DIR}/json_for_modern_cpp/" )
 
 
 # half
@@ -93,7 +83,7 @@ set_target_properties( multivih5datareaderop PROPERTIES COMPILE_FLAGS "-std=c++1
 set_target_properties( multivih5datareaderop PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}" )
 # use old ABI with gcc 5.x
 set_target_properties( multivih5datareaderop PROPERTIES COMPILE_DEFINITIONS "_GLIBCXX_USE_CXX11_ABI=0" )
-add_dependencies( multivih5datareaderop lz4 webp json_for_modern_cpp half)
+add_dependencies( multivih5datareaderop lz4 webp half)
 
 target_include_directories( multivih5datareaderop PRIVATE
         ${TENSORFLOW_INCLUDE_DIR}
