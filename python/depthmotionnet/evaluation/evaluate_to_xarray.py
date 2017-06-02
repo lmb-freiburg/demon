@@ -145,7 +145,7 @@ def get_data(iterative, results_h5_file, snap, sample, net_iter, gt_h5_file=None
         network iteration
 
     gt_h5_file: h5py.File
-        ground truth h5 file.\
+        ground truth h5 file.
 
     depthmask: bool
         If True the depth values for points not visible in the second image will be masked out
@@ -199,10 +199,10 @@ def get_data(iterative, results_h5_file, snap, sample, net_iter, gt_h5_file=None
     
     # reshape the predictions to GT size if necessary
     if ('depth_gt' in data) and ('depth_pred' in data) and (not (data['depth_gt'].shape == data['depth_pred'].shape)):
-        data['depth_pred'] = skimage.transform.resize(data['depth_pred'], data['depth_gt'].shape, order=0, preserve_range=True)
+        data['depth_pred'] = skimage.transform.resize(data['depth_pred'], data['depth_gt'].shape, order=0, mode='constant', preserve_range=True)
     if ('flow_gt' in data) and ('flow_pred' in data) and (not (data['flow_gt'].shape == data['flow_pred'].shape)):
         data['flow_pred'] = np.transpose(skimage.transform.resize(\
-                                np.transpose(data['flow_pred'],(1,2,0)), data['depth_gt'].shape, order=0, preserve_range=True),(2,0,1))
+                                np.transpose(data['flow_pred'],(1,2,0)), data['depth_gt'].shape, order=0, mode='constant', preserve_range=True),(2,0,1))
         
     if eigen_crop_gt_and_pred and data['depth_gt'].shape != (436,588):
         assert(data['depth_gt'].shape == (480,640))
@@ -212,6 +212,7 @@ def get_data(iterative, results_h5_file, snap, sample, net_iter, gt_h5_file=None
     
     return data
         
+
 def evaluate(results_file, gt_file, depthmask=False, eigen_crop_gt_and_pred=False, depth_scaling='abs'):
     '''
     Compute different error measures given a hdf5 result (prediction) file, and output them as an xarray.
