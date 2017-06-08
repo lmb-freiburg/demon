@@ -33,7 +33,9 @@ Building and using requires the following libraries and programs
 
 The versions match the configuration we have tested on an ubuntu 16.04 system.
 
-There is no binary package available for VTK with python3 interface and therefore it needs to be built from source.
+The binary package from [vtk.org](http://www.vtk.org) does not come with a python3 interface.
+To enable python3 support VTK needs to be built from source.
+Alternatively, there are also VTK packages with python3 support available in Anaconda via the conda package manager.
 
 The network also depends on our [lmbspecialops](https://github.com/lmb-freiburg/lmbspecialops) library which is included as a submodule.
 
