@@ -263,12 +263,12 @@ def create_prediction_file(dataset, dataset_dir):
 def main():
 
     # list the test datasets names for evaluation
-    datasets = ('mvs', 'scenes11', 'rgbd', 'sun3d')
+    datasets = ('mvs', 'scenes11', 'rgbd', 'sun3d', 'nyu2')
     dataset_dir = os.path.join('..', 'datasets')
 
 
 
-    # creating the ground truth and prediction files requires about 4gb of disk space
+    # creating the ground truth and prediction files requires about 11gb of disk space
     for dataset in datasets:
         gt_file = create_ground_truth_file(dataset, dataset_dir)
         
@@ -278,21 +278,25 @@ def main():
         # compute errors
         # the evaluate function expects the path to a prediction and the corresponding
         # ground truth file.
-        # depthmask=True will compute depth errors only for pixels visible in both images.
         print('computing errors for', dataset)
-        eval_result = evaluate(pr_file, gt_file, depthmask=True)
-        
+
+        # compute errors for comparison with single image depth methods
+        eval_result = evaluate(pr_file, gt_file, depthmask=False, eigen_crop_gt_and_pred=True)
         # save evaluation results to disk
-        write_xarray_json(eval_result, '{0}_eval.json'.format(dataset))
+        write_xarray_json(eval_result, '{0}_eval_crop_allpix.json'.format(dataset))
+        
+        if dataset != 'nyu2':
+            # depthmask=True will compute depth errors only for pixels visible in both images.
+            eval_result = evaluate(pr_file, gt_file, depthmask=True)
+            # save evaluation results to disk
+            write_xarray_json(eval_result, '{0}_eval.json'.format(dataset))
             
 
 
     # print errors
     for dataset in datasets:
         
-        eval_result = read_xarray_json('{0}_eval.json'.format(dataset))
-
-        # eval_result is a 5D array with the following dimensions:
+        # In the following eval_result is a 5D array with the following dimensions:
         #  - snapshots: stores results of different network training states
         #  - iteration: network iterations '0' stores the result of the bootstrap network.
         #               '3' stores the results after bootstrap + 3 times iterative network.
@@ -304,12 +308,18 @@ def main():
         #            to scale invariant error measures. Just set this to False and ignore.
         # 
         # The following prints the error metrics as used in the paper.
+
         depth_errors = ['depth_l1_inverse','depth_scale_invariant','depth_abs_relative']
         motion_errors = ['rot_err','tran_angle_err']
         print('======================================')
         print('dataset: ', dataset)
-        print('  depth', eval_result[0].loc['3_refined',:,depth_errors,False].mean('sample').to_pandas().to_string())
-        print('  motion', eval_result[0].loc['3',:,motion_errors,False].mean('sample').to_pandas().to_string())
+        if dataset != 'nyu2':
+            eval_result = read_xarray_json('{0}_eval.json'.format(dataset))
+            print('  depth', eval_result[0].loc['3_refined',:,depth_errors,False].mean('sample').to_pandas().to_string())
+            print('  motion', eval_result[0].loc['3',:,motion_errors,False].mean('sample').to_pandas().to_string())
+        eval_result = read_xarray_json('{0}_eval_crop_allpix.json'.format(dataset))
+        print('  depth cropped+all pixels', eval_result[0].loc['3_refined',:,['depth_scale_invariant'],False].mean('sample').to_pandas().to_string())
+        
 
 if __name__ == "__main__":
     main()
