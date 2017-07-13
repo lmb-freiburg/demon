@@ -18,6 +18,7 @@
 import pyximport; pyximport.install()
 import numpy as np
 
+from .view import View
 
 def compute_visible_points_mask( view1, view2, borderx=0, bordery=0 ):
     """Computes a mask of the pixels in view1 that are visible in view2
@@ -58,7 +59,7 @@ def compute_depth_ratios( view1, view2 ):
     return _compute_depth_ratios(view1, view2)
 
 
-def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9, min_valid_threshold=0.5 ):
+def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9, min_valid_threshold=0.5, min_depth_consistent=0.25 ):
     """Checks if the depth of view is consistent with the rest_of_the_views
     
     view: View namedtuple
@@ -84,12 +85,42 @@ def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9,
         if valid_dr.size / dr.size < min_valid_threshold:
             return False
 
-        # don't test max_ratio threshold because of occlusions
-        num_consistent = np.count_nonzero(valid_dr > min_ratio_threshold)
-        if num_consistent / dr.size < min_valid_threshold:
+        num_consistent = np.count_nonzero((valid_dr > min_ratio_threshold) & (valid_dr < max_ratio_threshold))
+        if num_consistent / dr.size < min_depth_consistent:
             return False
 
     return True
+
+
+def create_image_overview( views ):
+    """Creates a small overview image showing the RGB images of all views
+    
+    views: list of View  or  list of list of View
+
+    Returns a PIL.Image
+    """
+    assert isinstance(views, list)
+    from .helpers import concat_images_vertical, concat_images_horizontal
+    max_height = 100 # maximum height of individual images
+
+    def resize_image(img):
+        if img.size[1] > max_height:
+            new_width = int(img.size[0]*(max_height/img.size[1]))
+            return img.resize((new_width,max_height))
+        else:
+            return img
+
+    column_images = []
+    for col in views:
+        if isinstance(col,list):
+            tmp_images = []
+            for row in col:
+                tmp_images.append(resize_image(row.image))
+            col_img = concat_images_vertical(tmp_images)
+            column_images.append(col_img)
+        elif isinstance(col,View):
+            column_images.append(resize_image(col.image))
+    return concat_images_horizontal(column_images)
 
 
 def visualize_views( views ):
