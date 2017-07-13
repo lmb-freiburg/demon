@@ -17,6 +17,7 @@
 #
 import os
 import tensorflow
+from .helpers import *
 
 # try to import the multivih5datareaderop from the 'build' directory
 if 'MULTIVIH5DATAREADEROP_LIB' in os.environ:
