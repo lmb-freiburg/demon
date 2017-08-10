@@ -34,14 +34,15 @@ ExternalProject_Add(
 	URL "https://github.com/lz4/lz4/archive/v1.7.5.tar.gz"
         # do not update
         UPDATE_COMMAND ""
-        SOURCE_SUBDIR "contrib/cmake_unofficial"
+        # copy SOURCE_DIR CMakeLists.txt
+        PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/multivih5datareaderop/lz4_cmakelists.txt <SOURCE_DIR>/CMakeLists.txt
         CMAKE_CACHE_ARGS "-DBUILD_STATIC_LIBS:string=on"
         # do not install
         INSTALL_COMMAND ""
 )
 ExternalProject_Get_Property( lz4 SOURCE_DIR BINARY_DIR )
 set( lz4_INCLUDE_DIR "${SOURCE_DIR}/lib" )
-set( lz4_STATIC_LIB "${BINARY_DIR}/liblz4.a" )
+set( lz4_STATIC_LIB "${BINARY_DIR}/contrib/cmake_unofficial/liblz4.a" )
 
 
 # json for modern c++
@@ -52,19 +53,10 @@ set( json_for_modern_cpp_INCLUDE_DIR "${CMAKE_BINARY_DIR}/json_for_modern_cpp/" 
 
 
 # half
-ExternalProject_Add( 
-        half
-        PREFIX "${CMAKE_BINARY_DIR}/half"
-	URL "https://sourceforge.net/projects/half/files/latest/download?source=files"
-        # do not update, configure, build
-        UPDATE_COMMAND ""
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""
-        # do not install
-        INSTALL_COMMAND ""
-)
-ExternalProject_Get_Property( half SOURCE_DIR )
-set( half_INCLUDE_DIR "${SOURCE_DIR}/include" )
+message( STATUS "Downloading half" )
+file( DOWNLOAD "https://sourceforge.net/p/half/code/HEAD/tree/tags/release-1.12.0/include/half.hpp?format=raw"
+      "${CMAKE_BINARY_DIR}/half/include/half.hpp" SHOW_PROGRESS )
+set( half_INCLUDE_DIR "${CMAKE_BINARY_DIR}/half/include" )
 
 
 # retrieve tensorflow include dir
@@ -83,7 +75,7 @@ set_target_properties( multivih5datareaderop PROPERTIES COMPILE_FLAGS "-std=c++1
 set_target_properties( multivih5datareaderop PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}" )
 # use old ABI with gcc 5.x
 set_target_properties( multivih5datareaderop PROPERTIES COMPILE_DEFINITIONS "_GLIBCXX_USE_CXX11_ABI=0" )
-add_dependencies( multivih5datareaderop lz4 webp half)
+add_dependencies( multivih5datareaderop lz4 webp )
 
 target_include_directories( multivih5datareaderop PRIVATE
         ${TENSORFLOW_INCLUDE_DIR}
