@@ -37,7 +37,8 @@ def add_sources(params, dataset_files, weight, normalize=True, concatenate=False
         If True adds only a single source that contains all files.
 
     """
-    params['source'] = []
+    if not 'source' in params:
+        params['source'] = []
 
     if concatenate:
         # generate a single source with all paths
