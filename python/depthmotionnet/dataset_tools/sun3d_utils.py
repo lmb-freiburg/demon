@@ -109,7 +109,7 @@ def compute_sharpness(sun3d_data_path, seq_name):
     return np.asarray(sharpness)
 
 
-def create_samples_from_sequence(h5file, sun3d_data_path, seq_name, baseline_range, sharpness, sharpness_window=30):
+def create_samples_from_sequence(h5file, sun3d_data_path, seq_name, baseline_range, sharpness, sharpness_window=30, max_views_num=10):
     """Read a sun3d sequence and write samples to the h5file
     
     h5file: h5py.File handle
@@ -201,14 +201,15 @@ def create_samples_from_sequence(h5file, sun3d_data_path, seq_name, baseline_ran
                 continue
 
             view2 = View(R=R2, t=t2, K=intrinsics, image=None, depth=depth2, depth_metric='camera_z')
-            check_params = {'min_valid_threshold': 0.4, 'min_depth_consistent': 0.2 }
+            check_params = {'min_valid_threshold': 0.4, 'min_depth_consistent': 0.7 }
             if check_depth_consistency(view1, [view2],**check_params) and check_depth_consistency(view2, [view1], **check_params):
                 image2 = read_image(os.path.join(seq_path,'image',image_files[frame_idx2]))
                 view2 = view2._replace(image=image2)
                 views.append(view2)
                 used_views.add(i2)
                 # print(baseline, cosine)
-                
+            if len(views) > max_views_num:
+                break
             
         if len(views) > 1:
             group_name = group_prefix+'-{:07d}'.format(img_ids[i1])

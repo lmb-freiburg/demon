@@ -59,7 +59,7 @@ def compute_depth_ratios( view1, view2 ):
     return _compute_depth_ratios(view1, view2)
 
 
-def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9, min_valid_threshold=0.5, min_depth_consistent=0.25 ):
+def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9, min_valid_threshold=0.5, min_depth_consistent=0.7 ):
     """Checks if the depth of view is consistent with the rest_of_the_views
     
     view: View namedtuple
@@ -74,6 +74,8 @@ def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9,
     min_valid_threshold: float
         ratio of pixels that should have consistent depth values with the rest_of_the_views
 
+    min_depth_consistent: float
+        ratio of depth consistent pixels with respect to the number of valid depth ratios
 
     Returns True if the depth is consistent
     """
@@ -86,7 +88,7 @@ def check_depth_consistency( view, rest_of_the_views, depth_ratio_threshold=0.9,
             return False
 
         num_consistent = np.count_nonzero((valid_dr > min_ratio_threshold) & (valid_dr < max_ratio_threshold))
-        if num_consistent / dr.size < min_depth_consistent:
+        if num_consistent / valid_dr.size < min_depth_consistent:
             return False
 
     return True
