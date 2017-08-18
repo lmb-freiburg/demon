@@ -186,7 +186,7 @@ def create_samples_from_sequence(h5file, sun3d_data_path, seq_name, baseline_ran
         for i2 in range(i1+1, sharp_images_index.size):
             frame_idx2 = sharp_images_index[i2]
             R2, t2 = read_Rt(extrinsics, frame_idx2)
-            baseline = np.linalg.norm(t1-t2) # unit is meters
+            baseline = np.linalg.norm( (-R1.transpose().dot(t1)) - (-R2.transpose().dot(t2))) # unit is meters
             if baseline < baseline_range[0] or baseline > baseline_range[1]:
                 continue
             
