@@ -107,7 +107,7 @@ try:
     from depthmotionnet.vis import *
     visualize_prediction(
         inverse_depth=result['predict_depth0'], 
-        image=input_data['image_pair'][0,0:3], 
+        image=input_data['image_pair'][0,0:3] if data_format=='channels_first' else input_data['image_pair'].transpose([0,3,1,2])[0,0:3], 
         rotation=rotation, 
         translation=translation)
 except ImportError as err:
