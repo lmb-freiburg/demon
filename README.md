@@ -2,8 +2,8 @@
 
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
-DeMoN is a ConvNet architecture for solving structure from motion from two views.
-It estimates the depth and relative camera motion for pairs of images.
+DeMoN is "A computer algorithm for reconstructing a scene from two projections"<sup>1</sup>.
+The network estimates the depth and relative camera motion for pairs of images; it addresses the important two view case in structure from motion.
 
 ![Teaser](teaser.png)
 
@@ -20,6 +20,7 @@ If you use this code for research please cite:
 
 See the [project website](https://lmb.informatik.uni-freiburg.de/people/ummenhof/depthmotionnet) for the paper and other material.
 
+<sup>1 This is the title of H. C. Longuet-Higgins paper from 1981, which perfectly describes what our method does. DeMoN shows that complex geometric relations can be learnt by a ConvNet.</sup>
 
 ## Requirements
 
