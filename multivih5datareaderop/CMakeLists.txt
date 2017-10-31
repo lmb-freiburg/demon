@@ -100,4 +100,7 @@ target_link_libraries( multivih5datareaderop
         ${OpenCV_LIBS}
 	${TENSORFLOW_FRAMEWORK_LIB}
 )
+if( TENSORFLOW_FRAMEWORK_LIB )
+        target_link_libraries( multivih5datareaderop ${TENSORFLOW_FRAMEWORK_LIB} )
+endif()
 
