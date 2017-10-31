@@ -79,6 +79,7 @@ add_dependencies( multivih5datareaderop lz4 webp )
 
 target_include_directories( multivih5datareaderop PRIVATE
         ${TENSORFLOW_INCLUDE_DIR}
+        ${TENSORFLOW_INCLUDE_DIR}/external/nsync/public/
         ${lz4_INCLUDE_DIR}
         ${webp_INCLUDE_DIR}
         ${HDF5_INCLUDE_DIRS}        
