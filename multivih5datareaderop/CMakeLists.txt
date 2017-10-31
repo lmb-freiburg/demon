@@ -98,7 +98,6 @@ target_link_libraries( multivih5datareaderop
         ${webp_LIBRARY}
         ${HDF5_LIBRARIES}        
         ${OpenCV_LIBS}
-	${TENSORFLOW_FRAMEWORK_LIB}
 )
 if( TENSORFLOW_FRAMEWORK_LIB )
         target_link_libraries( multivih5datareaderop ${TENSORFLOW_FRAMEWORK_LIB} )
