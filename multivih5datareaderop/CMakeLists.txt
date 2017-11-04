@@ -59,10 +59,15 @@ file( DOWNLOAD "https://sourceforge.net/p/half/code/HEAD/tree/tags/release-1.12.
 set( half_INCLUDE_DIR "${CMAKE_BINARY_DIR}/half/include" )
 
 
-# retrieve tensorflow include dir
+# retrieve tensorflow include dir and lib dir
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "-c" "from __future__ import print_function; import tensorflow as tf; print(tf.sysconfig.get_include(), end='')" 
         OUTPUT_VARIABLE TENSORFLOW_INCLUDE_DIR )
-message( STATUS "tensorflow include dir: ${TENSORFLOW_INCLUDE_DIR}" )
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "-c" "from __future__ import print_function; import tensorflow as tf; print(tf.sysconfig.get_lib(), end='')" 
+        OUTPUT_VARIABLE TENSORFLOW_LIB_DIR )
+find_library( TENSORFLOW_FRAMEWORK_LIB tensorflow_framework PATHS "${TENSORFLOW_LIB_DIR}" NO_DEFAULT_PATH )
+message( STATUS "${TENSORFLOW_INCLUDE_DIR}" )
+message( STATUS "${TENSORFLOW_LIB_DIR}" )
+message( STATUS "${TENSORFLOW_FRAMEWORK_LIB}" )
 
 file( GLOB multivih5datareaderop_SOURCES *.cpp *.cc )
 
@@ -79,6 +84,7 @@ add_dependencies( multivih5datareaderop lz4 webp )
 
 target_include_directories( multivih5datareaderop PRIVATE
         ${TENSORFLOW_INCLUDE_DIR}
+        ${TENSORFLOW_INCLUDE_DIR}/external/nsync/public/
         ${lz4_INCLUDE_DIR}
         ${webp_INCLUDE_DIR}
         ${HDF5_INCLUDE_DIRS}        
@@ -93,4 +99,7 @@ target_link_libraries( multivih5datareaderop
         ${HDF5_LIBRARIES}        
         ${OpenCV_LIBS}
 )
+if( TENSORFLOW_FRAMEWORK_LIB )
+        target_link_libraries( multivih5datareaderop ${TENSORFLOW_FRAMEWORK_LIB} )
+endif()
 
