@@ -429,17 +429,7 @@ def depthmotion_block(image_pair, image2_2, prev_flow2, prev_flowconf2, prev_rot
     motion_conv5_1 = tf.concat((motion_conv5a, motion_conv5b), axis=1 if data_format=='channels_first' else 3)
 
     if data_format=='channels_last':
-        motion_conv1 = convert_NHWC_to_NCHW(motion_conv5_1)
-    motion_conv1 = convrelu(
-        name='motion_conv1',
-        inputs=conv5_1,
-        num_outputs=128,
-        kernel_size=3,
-        strides=1,
-        **conv_params,
-    )
-    if data_format=='channels_last':
-        motion_conv5_1 = convert_NHWC_to_NCHW(motion_conv1)
+        motion_conv5_1 = convert_NHWC_to_NCHW(motion_conv5_1)
     motion_fc1 = tf.layers.dense(
         name='motion_fc1',
         inputs=tf.contrib.layers.flatten(motion_conv5_1),
