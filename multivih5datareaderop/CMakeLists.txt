@@ -36,7 +36,7 @@ ExternalProject_Add(
         UPDATE_COMMAND ""
         # copy SOURCE_DIR CMakeLists.txt
         PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/multivih5datareaderop/lz4_cmakelists.txt <SOURCE_DIR>/CMakeLists.txt
-        CMAKE_CACHE_ARGS "-DBUILD_STATIC_LIBS:string=on"
+        CMAKE_CACHE_ARGS "-DLZ4_BUNDLED_MODE:string=off" "-DBUILD_STATIC_LIBS:string=on" "-DBUILD_SHARED_LIBS:string=on"
         # do not install
         INSTALL_COMMAND ""
 )

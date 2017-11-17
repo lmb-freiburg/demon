@@ -20,7 +20,7 @@ import os
 
 # try the version used by the multivih5datareaderop first
 try:
-    _lib_path = os.path.abspath(os.path.join(os.path.split(__file__)[0], '..', '..', '..', 'build','lz4','src','lz4-build', 'liblz4.so'))
+    _lib_path = os.path.abspath(os.path.join(os.path.split(__file__)[0], '..', '..', '..', 'build','lz4','src','lz4-build','contrib', 'cmake_unofficial', 'liblz4.so'))
     liblz4 = CDLL(_lib_path)
 except:
     # try system version
