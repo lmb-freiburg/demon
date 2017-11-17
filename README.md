@@ -45,7 +45,7 @@ The network also depends on our [lmbspecialops](https://github.com/lmb-freiburg/
 ## Build instructions
 
 The following describes how to install tensorflow and demon into a new virtualenv and run the inference example.
-We will use ```pew``` (```pip install pew```) to manage a new virtualenv named ```demon_venv``` in the following:
+We will use ```pew``` (```pip3 install pew```) to manage a new virtualenv named ```demon_venv``` in the following:
 
 ```bash
 # create virtualenv
@@ -56,10 +56,10 @@ The following commands all run inside the virtualenv:
 
 ```bash
 # install python module dependencies
-pip install tensorflow-gpu # or 'tensorflow' without gpu support
-pip install pillow # for reading images
-pip install matplotlib # required for visualizing depth maps
-pip install Cython # required for visualizing point clouds
+pip3 install tensorflow-gpu # or 'tensorflow' without gpu support
+pip3 install pillow # for reading images
+pip3 install matplotlib # required for visualizing depth maps
+pip3 install Cython # required for visualizing point clouds
 ```
 
 ```bash
