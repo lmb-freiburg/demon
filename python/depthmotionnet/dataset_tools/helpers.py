@@ -71,3 +71,67 @@ def concat_images_horizontal(images):
     return result
 
 
+def safe_crop_image(image, box, fill_value):
+    """crops an image and adds a border if necessary
+    
+    image: PIL.Image
+
+    box: 4 tuple
+        (x0,y0,x1,y1) tuple
+
+    fill_value: color value, scalar or tuple
+
+    Returns the cropped image
+    """
+    x0, y0, x1, y1 = box
+    if x0 >=0 and y0 >= 0 and x1 < image.width and y1 < image.height:
+        return image.crop(box)
+    else:
+        crop_width = x1-x0
+        crop_height = y1-y0
+        tmp = Image.new(image.mode, (crop_width, crop_height), fill_value)
+        safe_box = (
+            max(0,min(x0,image.width-1)),
+            max(0,min(y0,image.height-1)),
+            max(0,min(x1,image.width)),
+            max(0,min(y1,image.height)),
+            )
+        img_crop = image.crop(safe_box)
+        x = -x0 if x0 < 0 else 0
+        y = -y0 if y0 < 0 else 0
+        tmp.paste(image, (x,y))
+        return tmp
+
+
+def safe_crop_array2d(arr, box, fill_value):
+    """crops an array and adds a border if necessary
+    
+    arr: numpy.ndarray with 2 dims
+
+    box: 4 tuple
+        (x0,y0,x1,y1) tuple. x is the column and y is the row!
+
+    fill_value: scalar
+
+    Returns the cropped array
+    """
+    x0, y0, x1, y1 = box
+    if x0 >=0 and y0 >= 0 and x1 < arr.shape[1] and y1 < arr.shape[0]:
+        return arr[y0:y1,x0:x1]
+    else:
+        crop_width = x1-x0
+        crop_height = y1-y0
+        tmp = np.full((crop_height, crop_width), fill_value, dtype=arr.dtype)
+        safe_box = (
+            max(0,min(x0,arr.shape[1]-1)),
+            max(0,min(y0,arr.shape[0]-1)),
+            max(0,min(x1,arr.shape[1])),
+            max(0,min(y1,arr.shape[0])),
+            )
+        x = -x0 if x0 < 0 else 0
+        y = -y0 if y0 < 0 else 0
+        safe_width = safe_box[2]-safe_box[0]
+        safe_height = safe_box[3]-safe_box[1]
+        tmp[y:y+safe_height,x:x+safe_width] = arr[safe_box[1]:safe_box[3],safe_box[0]:safe_box[2]]
+        return tmp
+
