@@ -83,14 +83,21 @@ def compute_visible_points_mask( view1, view2, borderx=0, bordery=0 ):
     P2[:,3:4] = view2.t.reshape((3,1))
     P2 = view2.K.dot(P2)
 
+    if view2.depth is None:
+        width2 = view1.depth.shape[1]
+        height2 = view1.depth.shape[0]
+    else:
+        width2 = view2.depth.shape[1]
+        height2 = view2.depth.shape[0]
+
     return _compute_visible_points_mask(
             view1.depth, 
             view1.K.astype(np.float32), 
             view1.R.astype(np.float32), 
             view1.t.astype(np.float32), 
             P2.astype(np.float32), 
-            view2.depth.shape[1], 
-            view2.depth.shape[0],
+            width2,
+            height2,
             borderx,
             bordery)
 
