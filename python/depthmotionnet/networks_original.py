@@ -20,7 +20,7 @@ from .blocks_original import *
 
 
 class BootstrapNet:
-    def __init__(self, session, data_format='channels_first'):
+    def __init__(self, session, data_format='channels_first', batch_size=1):
         """Creates the network
 
         session: tf.Session
@@ -29,14 +29,17 @@ class BootstrapNet:
         data_format: str
             Either 'channels_first' or 'channels_last'.
             Running on the cpu requires 'channels_last'.
+
+        batch_size: int
+            The batch size
         """
         self.session = session
         if data_format=='channels_first':
-            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(1,6,192,256))
-            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(1,3,48,64))
+            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(batch_size,6,192,256))
+            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,3,48,64))
         else:
-            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(1,192,256,6))
-            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(1,48,64,3))
+            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(batch_size,192,256,6))
+            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,48,64,3))
 
         with tf.variable_scope('netFlow1'):
             netFlow1_result = flow_block_demon_original(self.placeholder_image_pair, data_format=data_format )
@@ -58,7 +61,7 @@ class BootstrapNet:
         """Runs the bootstrap network
         
         image_pair: numpy.ndarray
-            Array with shape [1,6,192,256] if data_format=='channels_first'
+            Array with shape [N,6,192,256] if data_format=='channels_first'
             
             Image pair in the range [-0.5, 0.5]
 
@@ -87,7 +90,7 @@ class BootstrapNet:
 
 
 class IterativeNet:
-    def __init__(self, session, data_format='channels_first'):
+    def __init__(self, session, data_format='channels_first', batch_size=1):
         """Creates the network
 
         session: tf.Session
@@ -96,24 +99,28 @@ class IterativeNet:
         data_format: str
             Either 'channels_first' or 'channels_last'.
             Running on the cpu requires 'channels_last'.
+
+        batch_size: int
+            The batch size
         """
         self.session = session
 
-        self.intrinsics = tf.constant([[0.89115971, 1.18821287, 0.5, 0.5]], dtype=tf.float32)
+        intrinsics = np.broadcast_to(np.array([[0.89115971, 1.18821287, 0.5, 0.5]]),(batch_size,4))
+        self.intrinsics = tf.constant(intrinsics, dtype=tf.float32)
 
         if data_format == 'channels_first':
-            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(1,6,192,256))
-            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(1,3,48,64))
-            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(1,1,48,64))
-            self.placeholder_normal2 = tf.placeholder(dtype=tf.float32, shape=(1,3,48,64))
+            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(batch_size,6,192,256))
+            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,3,48,64))
+            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,1,48,64))
+            self.placeholder_normal2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,3,48,64))
         else:
-            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(1,192,256,6))
-            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(1,48,64,3))
-            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(1,48,64,1))
-            self.placeholder_normal2 = tf.placeholder(dtype=tf.float32, shape=(1,48,64,3))
+            self.placeholder_image_pair = tf.placeholder(dtype=tf.float32, shape=(batch_size,192,256,6))
+            self.placeholder_image2_2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,48,64,3))
+            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,48,64,1))
+            self.placeholder_normal2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,48,64,3))
 
-        self.placeholder_rotation = tf.placeholder(dtype=tf.float32, shape=(1,3))
-        self.placeholder_translation = tf.placeholder(dtype=tf.float32, shape=(1,3))
+        self.placeholder_rotation = tf.placeholder(dtype=tf.float32, shape=(batch_size,3))
+        self.placeholder_translation = tf.placeholder(dtype=tf.float32, shape=(batch_size,3))
 
         with tf.variable_scope('netFlow2'):
             netFlow2_result = flow_block_demon_original(
@@ -148,7 +155,7 @@ class IterativeNet:
         """Runs the iterative network
         
         image_pair: numpy.ndarray
-            Array with shape [1,6,192,256] if data_format=='channels_first'
+            Array with shape [N,6,192,256] if data_format=='channels_first'
             
             Image pair in the range [-0.5, 0.5]
 
@@ -194,7 +201,7 @@ class IterativeNet:
 
 class RefinementNet:
 
-    def __init__(self, session, data_format='channels_first'):
+    def __init__(self, session, data_format='channels_first', batch_size=1):
         """Creates the network
 
         session: tf.Session
@@ -203,15 +210,18 @@ class RefinementNet:
         data_format: str
             Either 'channels_first' or 'channels_last'.
             Running on the cpu requires 'channels_last'.
+
+        batch_size: int
+            The batch size
         """
         self.session = session
 
         if data_format == 'channels_first':
-            self.placeholder_image1 = tf.placeholder(dtype=tf.float32, shape=(1,3,192,256))
-            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(1,1,48,64))
+            self.placeholder_image1 = tf.placeholder(dtype=tf.float32, shape=(batch_size,3,192,256))
+            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,1,48,64))
         else:
-            self.placeholder_image1 = tf.placeholder(dtype=tf.float32, shape=(1,192,256,3))
-            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(1,48,64,1))
+            self.placeholder_image1 = tf.placeholder(dtype=tf.float32, shape=(batch_size,192,256,3))
+            self.placeholder_depth2 = tf.placeholder(dtype=tf.float32, shape=(batch_size,48,64,1))
 
 
         with tf.variable_scope('netRefine'):
@@ -227,7 +237,7 @@ class RefinementNet:
         """Runs the refinement network
         
         image1: numpy.ndarray
-            Array with the first image with shape [1,3,192,256] if data_format=='channels_first'
+            Array with the first image with shape [N,3,192,256] if data_format=='channels_first'
 
         depth2: numpy.ndarray
             Depth prediction at resolution level 2
