@@ -172,6 +172,50 @@ def adjust_intrinsics(view, K_new, width_new, height_new):
     return View(R=view.R, t=view.t, K=K_new, image=img_new, depth=depth_new, depth_metric=view.depth_metric)
 
 
+def resize_view(view, width_new, height_new):
+    """Creates a new View with the new size.
+    The intrinsics will be adjusted to match the new image size
+    
+    view: View namedtuple
+        The view tuple
+
+    width_new: int
+        The new image width
+        
+    height_new: int
+        The new image height
+
+    Returns a View tuple with adjusted image, depth and intrinsics
+    """
+    from PIL import Image
+    from skimage.transform import resize
+
+    if view.image.width == width_new and view.image.height == height_new:
+        return View(*view)
+
+    #original param
+    fx = view.K[0,0]
+    fy = view.K[1,1]
+    cx = view.K[0,2]
+    cy = view.K[1,2]
+    width = view.image.width
+    height = view.image.height
+
+    #target param
+    fx_new = width_new*fx/width
+    fy_new = height_new*fy/height
+    cx_new = width_new*cx/width
+    cy_new = height_new*cy/height
+
+    K_new = np.array([fx_new, 0, cx_new, 0, fy_new, cy_new, 0, 0, 1],dtype=np.float64).reshape((3,3))
+
+    img_resize = view.image.resize((width_new, height_new), Image.BILINEAR if width_new > width else Image.LANCZOS)
+    max_depth = view.depth.max()
+    depth_resize = max_depth*resize(view.depth/max_depth, (height_new, width_new), order=0, mode='constant')
+    depth_resize = depth_resize.astype(view.depth.dtype)
+    return View(R=view.R, t=view.t, K=K_new, image=img_resize, depth=depth_resize, depth_metric=view.depth_metric)
+
+
 def compute_view_distances( views ):
     """Computes the spatial distances between views
 
