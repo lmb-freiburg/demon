@@ -18,7 +18,7 @@ provided files for your research.
 
   
 
-  * rgbd_train.h5 is based on the RGBD SLAM benchmark http://vision.in.tum.de/data/datasets/rgbd-dataset (licensed under CC-BY 3.0)
+  * rgbd_bugfix_train.h5 is based on the RGBD SLAM benchmark http://vision.in.tum.de/data/datasets/rgbd-dataset (licensed under CC-BY 3.0)
     
     J. Sturm, N. Engelhard, F. Endres, W. Burgard, and D. Cremers, “A benchmark for the evaluation of RGB-D SLAM systems,” in 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems, 2012, pp. 573–580.
 
@@ -48,7 +48,7 @@ if [ "$answer" != "Y" -a "$answer" != "y" ]; then
 fi
 echo
 
-datasets=(sun3d rgbd mvs scenes11)
+datasets=(sun3d rgbd_bugfix mvs scenes11)
 
 OLD_PWD="$PWD"
 DESTINATION=traindata
@@ -56,17 +56,14 @@ mkdir $DESTINATION
 cd $DESTINATION
 
 if [ ! -e "README_traindata" ]; then
-	wget "https://lmb.informatik.uni-freiburg.de/data/demon/traindata/README_traindata"
-fi
-if [ ! -e "traindata.md5" ]; then
-	wget "https://lmb.informatik.uni-freiburg.de/data/demon/traindata/traindata.md5"
+	wget --no-check-certificate "https://lmb.informatik.uni-freiburg.de/data/demon/traindata/README_traindata"
 fi
 
 for ds in ${datasets[@]}; do
 	if [ -e "${ds}_train.h5" ]; then
 		echo "${ds}_train.h5 already exists, skipping ${ds}"
 	else
-		wget "https://lmb.informatik.uni-freiburg.de/data/demon/traindata/${ds}_train.tgz"
+		wget --no-check-certificate "https://lmb.informatik.uni-freiburg.de/data/demon/traindata/${ds}_train.tgz"
 		tar -xvf "${ds}_train.tgz"
 	fi
 done

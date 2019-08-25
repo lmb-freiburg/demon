@@ -60,7 +60,7 @@ for ds in ${datasets[@]}; do
 	if [ -e "${ds}_test.h5" ]; then
 		echo "${ds}_test.h5 already exists, skipping ${ds}"
 	else
-		wget "https://lmb.informatik.uni-freiburg.de/data/demon/testdata/${ds}_test.tgz"
+		wget --no-check-certificate "https://lmb.informatik.uni-freiburg.de/data/demon/testdata/${ds}_test.tgz"
 		tar -xvf "${ds}_test.tgz"
 	fi
 done
