@@ -1,0 +1,25 @@
+d968ca0fa1785d57559469fdcb476121 *mvs_achteck_turm.h5
+34818891c3b6ae66c90badc9a24ed015 *mvs_breisach.h5
+b3af67b01725f3cd99d6cebad08857e9 *mvs_citywall.h5
+#  2543a4b1a2cc8385d342958b2557d25e *rgbd_10_to_20_3d_train.h5
+#  ee6c5805c0244b01268e394e33b4e455 *rgbd_10_to_20_handheld_train.h5
+a316f02a84abe42ccb6a1d5450ac4bf1 *rgbd_10_to_20_simple_train.h5
+#  5be8f60f0e1d9f5afaa3ee0afcb5e3be *rgbd_20_to_inf_3d_train.h5
+#  3e6c78142bfd7a92d647abf443e98e3c *rgbd_20_to_inf_handheld_train.h5
+0ee80f4b7450bbaa4df59854b73ca770 *rgbd_20_to_inf_simple_train.h5
+2e07e7b76a4e39254dd046cfe6754fe7 *scenes11_train.h5
+ab1190b58350ed3f39b4d5e2966fb45c *sun3d_train_0.01m_to_0.1m.h5
+d72b646f474559e7338a65c2199da544 *sun3d_train_0.1m_to_0.2m.h5
+d31bbefcffbfd795d2a19193ab61478f *sun3d_train_0.2m_to_0.4m.h5
+8aeaae77e38f6493e52a0a0a7bcac8e3 *sun3d_train_0.4m_to_0.8m.h5
+6e872b0fec5cd5a404e25c034e1c9322 *sun3d_train_0.8m_to_1.6m.h5
+0d306ed5e6e4e4dcb5371b4c0c132e6a *sun3d_train_1.6m_to_infm.h5
+a981ec421da35df09225e875ce7531f8 *mvs_train.tgz
+#  cd11f27d9c5d170030ad46dc1e032cf8 *rgbd_train.tgz
+2cc58de179d11a5fa88f3a67edb0a5d2 *scenes11_train.tgz
+a77e1a5159258fadc0216e647fa21f33 *sun3d_train.tgz
+3c8111feb0eebe50b5068c4a71ac6a28 *rgbd_bugfix_10_to_20_3d_train.h5
+2c02bd33e6e5a7550ef5abe8eee1609e *rgbd_bugfix_10_to_20_handheld_train.h5
+286c2b2bee520a427f347e848660636a *rgbd_bugfix_20_to_inf_3d_train.h5
+9a1907607af8d7543b99df33ae4d4733 *rgbd_bugfix_20_to_inf_handheld_train.h5
+3975c81540462d7ba009190381f2d88b *rgbd_bugfix_train.tgz
