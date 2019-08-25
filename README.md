@@ -111,6 +111,14 @@ Instructions for training a clean tensorflow version of DeMoN are [here](trainin
 Note that the tensorflow training code and model are work in progress and are not identical to the original Caffe version.
 
 
+## Datasets
+
+Download scripts for training and testing are located in the ```datasets``` subdirectory.
+Note that due to a bug that some of the dataset files with the prefix ```rgbd`` did contain some samples from the test set.
+The affected files have been replaced and now have the prefix ```rgbd_bugfix```.
+MD5 checksums for all files can be found in the file ```traindata.md5```.
+
+
 ## License
 
 DeMoN is under the [GNU General Public License v3.0](LICENSE.txt)
