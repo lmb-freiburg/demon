@@ -114,7 +114,7 @@ Note that the tensorflow training code and model are work in progress and are no
 ## Datasets
 
 Download scripts for training and testing are located in the ```datasets``` subdirectory.
-Note that due to a bug that some of the dataset files with the prefix ```rgbd`` did contain some samples from the test set.
+Note that due to a bug that some of the dataset files with the prefix ```rgbd``` did contain some samples from the test set.
 The affected files have been replaced and now have the prefix ```rgbd_bugfix```.
 MD5 checksums for all files can be found in the file ```traindata.md5```.
 
