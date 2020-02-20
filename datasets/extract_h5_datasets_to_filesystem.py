@@ -28,16 +28,14 @@ def save_to_filesystem(h5_dir, element):
             save_to_filesystem(os.path.join(h5_dir, key), value)
         elif type(value) is h5py.Dataset:
             if value.dtype == np.uint8 or value.dtype == np.int8:
-                uncompressed_size = 480*640*2 if key == 'depth' else 480*640*3
-                image_dtype = np.uint16 if key == 'depth' else np.uint8
                 compressed_bytes = np.array(value).tobytes()
                 if key == 'depth':
-                    decompressed_bytes = lz4.block.decompress(compressed_bytes, uncompressed_size=uncompressed_size)
-                    cv2_image = np.frombuffer(decompressed_bytes, dtype=image_dtype).reshape((480, 640, -1))
+                    decompressed_bytes = lz4.block.decompress(compressed_bytes, uncompressed_size=480*640*2)
+                    cv2_image = np.frombuffer(decompressed_bytes, dtype=np.uint16).reshape((480, 640, -1))
                 else:
                     img_bytesio = BytesIO(compressed_bytes)
                     pil_img = Image.open(img_bytesio, 'r')
-                    cv2_image = np.array(pil_img.convert('RGB'))
+                    cv2_image = np.flip(pil_img.convert('RGB'), -1)
                 cv2.imwrite(os.path.join(h5_dir, key) + '.png', cv2_image)
             elif value.dtype == np.float32 or value.dtype == np.float64:
                 with open(os.path.join(h5_dir, key) + '.txt', 'w+') as vector_file:
