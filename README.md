@@ -118,8 +118,35 @@ Note that due to a bug that some of the dataset files with the prefix ```rgbd```
 The affected files have been replaced and now have the prefix ```rgbd_bugfix```.
 MD5 checksums for all files can be found in the file ```traindata.md5```.
 
+## Docker build
+Ensure Docker is installed on your system, and that the default Docker runtime
+is Nvidia:
+
+```
+{
+  "runtimes": {
+    "nvidia": {
+      "path": "/usr/bin/nvidia-container-runtime",
+        "runtimeArgs": []
+    }
+  },
+  "default-runtime": "nvidia"
+}
+```
+
+Then issue the Docker build command:
+
+```
+$ docker build . -t demon
+```
+
+To visualize the example:
+
+```
+$ docker run --gpus all -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro demon
+```
+
 
 ## License
 
 DeMoN is under the [GNU General Public License v3.0](LICENSE.txt)
-
